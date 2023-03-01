@@ -1,67 +1,64 @@
 import throttle from 'lodash.throttle';
-// localStorage.setItem(
-//   'feedback-form-state',
-//   JSON.stringify({ name: 'Lisa', age: 25 })
-// );
-
-// const saveData = localStorage.getItem('feedback-form-state');
-// console.log(saveData);
-
-// const parsedData = JSON.parse(saveData);
-// console.log(parsedData);
+import throttle from 'lodash.throttle';
 
 const STORAGE_KEY = 'feedback-form-state';
-
-const formData = {};
+let formData = { message: '', email: '' };
 
 const refs = {
   form: document.querySelector('.feedback-form'),
+  input: document.querySelector('.feedback-form input'),
   textarea: document.querySelector('.feedback-form textarea'),
 };
 
 refs.form.addEventListener('submit', onFormSubmit);
-// refs.textarea.addEventListener('input', throttle(onTextareaInput, 500));
-refs.form.addEventListener('input', throttle(onFormInput, 500));
+// refs.textarea.addEventListener('input', throttle(onEmailInput, 500));
+// refs.input.addEventListener('input', throttle(onTextareaInput, 500));
+refs.textarea.addEventListener('input', onEmailInput);
+refs.input.addEventListener('input', onTextareaInput);
 
-populateTextarea();
+populateText();
 
 // -------------------------------------------------
-// 1
-// function onTextareaInput(evt) {
-//   const message = evt.target.value;
-
-//   localStorage.setItem(STORAGE_KEY, message);
-// }
-
-// --------------------------------------------------
-// 1.2
+// Команди при відправки форми Submit
 function onFormSubmit(evt) {
+  // Зупиняємо відправку форми за замовченням
   evt.preventDefault();
-
+  // Виводимо у консоль данні відправки
+  console.log(JSON.parse(localStorage.getItem(STORAGE_KEY)));
+  // Очищюємо поля
   evt.currentTarget.reset();
   localStorage.removeItem(STORAGE_KEY);
+  formData = { message: '', email: '' };
 }
 // ---------------------------------------------------
 
-function populateTextarea() {
-  const saveMessage = localStorage.getItem(STORAGE_KEY);
+function onTextareaInput(evt) {
+  if (localStorage.getItem(STORAGE_KEY)) {
+    formData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  }
 
-  if (saveMessage) {
-    // console.log(saveMessage);
-    // refs.textarea.value = saveMessage;
-    refs.form.value = saveMessage;
+  formData.message = evt.target.value;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+}
+
+function onEmailInput(evt) {
+  if (localStorage.getItem(STORAGE_KEY)) {
+    formData = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  }
+
+  formData.email = evt.target.value;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+}
+
+// Команда перевірки, наявного тексту в STORAGE_KEY, при старті
+function populateText() {
+  if (localStorage.getItem(STORAGE_KEY)) {
+    const savedMassege = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    refs.textarea.value = savedMassege.message;
+    refs.input.value = savedMassege.email;
+
+    console.log(refs.input.value);
   }
 }
 
-function onFormInput(evt) {
-  formData[evt.target.name] = evt.target.value;
-}
-console.log(formData);
-
-localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-
-const saveData = localStorage.getItem(STORAGE_KEY);
-// console.log(STORAGE_KEY);
-
-const parsedData = JSON.parse(saveData);
-console.log(parsedData);
+// console.log(formData);
