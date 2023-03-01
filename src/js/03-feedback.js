@@ -3,30 +3,33 @@ import throttle from 'lodash.throttle';
 const STORAGE_KEY = 'feedback-form-state';
 let formData = { message: '', email: '' };
 
+console.log(formData);
+
 const refs = {
   form: document.querySelector('.feedback-form'),
   input: document.querySelector('.feedback-form input'),
   textarea: document.querySelector('.feedback-form textarea'),
 };
 
-console.log(refs);
+// const formEl = document.querySelector('.feedback-form');
+// console.log(formEl);
 
 refs.form.addEventListener('submit', onFormSubmit);
-// refs.textarea.addEventListener('input', throttle(onEmailInput, 500));
-// refs.input.addEventListener('input', throttle(onTextareaInput, 500));
-refs.textarea.addEventListener('input', onEmailInput);
-refs.input.addEventListener('input', onTextareaInput);
+refs.textarea.addEventListener('input', throttle(onEmailInput, 500));
+refs.input.addEventListener('input', throttle(onTextareaInput, 500));
+// refs.textarea.addEventListener('input', onEmailInput);
+// refs.input.addEventListener('input', onTextareaInput);
 
 populateText();
 
 // -------------------------------------------------
-// Команди при відправки форми Submit
+// Відправка форми
 function onFormSubmit(evt) {
   // Зупиняємо відправку форми за замовченням
   evt.preventDefault();
   // Виводимо у консоль данні відправки
   console.log(JSON.parse(localStorage.getItem(STORAGE_KEY)));
-  // Очищюємо поля
+
   evt.currentTarget.reset();
   localStorage.removeItem(STORAGE_KEY);
   formData = { message: '', email: '' };
@@ -51,7 +54,6 @@ function onEmailInput(evt) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
 }
 
-// Команда перевірки, наявного тексту в STORAGE_KEY, при старті
 function populateText() {
   if (localStorage.getItem(STORAGE_KEY)) {
     const savedMassege = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -61,5 +63,3 @@ function populateText() {
     console.log(refs.input.value);
   }
 }
-
-console.log(formData);
